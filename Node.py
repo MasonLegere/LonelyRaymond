@@ -5,8 +5,10 @@ import random
 from Message import *
 
 '''
- This acts as a complete implementation of Raymond's algorithm 
- for an arbitrary number of number of nodes. 
+ This acts as a complete implementation of Raymond's algorithm for distributed mutual 
+ exclusion for an arbitrary number of number of nodes. Further this architecture can 
+ be expanded to fit an arbitrary number of resources. Simulation parameters are included 
+ for more realistic and interesting results.
  
  Note: - Currently there is no support for a different number of resources 
          but this can easily be resolved by creating new message types.
@@ -67,9 +69,13 @@ class Node:
         self.asked = 0
         self.using = 0
         self.left = 0
+
+        # simulation parameters
         self.request_freq = request_freq
         self.computation_mean = computation_mean
         self.computation_stdev = computation_stdev
+
+        # debugging variable
         self.nhbrs = None
 
     def set_nhbrs(self, nhbrs):
@@ -106,7 +112,7 @@ class Node:
                     self.using = 1
                     # Entering the critical section
                     # TODO change to non-constant time amount
-                    print('I am in the critical section' + str(self.number) + '   ' + str(self.env.now))
+                    print('I am in the critical section ' + str(self.number) + '   ' + str(self.env.now))
                     # Doing work in the critical section
                     yield self.env.timeout(10)
                     self.left = env.now
@@ -126,24 +132,25 @@ class Node:
 
                     # Send request to the new holder in the case where there is more
                     # than one outstanding node on the queue.
-                    if self.holder == self and len(self.queue) != 0 and self.asked == 0:
-                        # TODO add calculation for sending speed
+                    if self.holder != self and len(self.queue) != 0 and self.asked == 0:
+                        yield env.timeout(self.transmission_time(self.holder))
+                        print('Sending message x')
                         pipe.put(Message(self.holder, resource_request, self))
                         self.asked = 1
 
                 else:
-                    # TODO add calculation for sending speed
-                    yield env.timeout()
+                    print('Sending message xx')
+                    yield env.timeout(self.transmission_time(self.holder))
                     pipe.put(Message(self.holder, pass_key, self))
             # make request
 
             if self.holder != self and len(self.queue) != 0 and self.asked == 0:
-                # TODO add calculation for sending speed
-                print('I make a request')
+                yield env.timeout(self.transmission_time(self.holder))
                 pipe.put(Message(self.holder, resource_request, self))
                 self.asked = 1
 
-    def send_message(self, env, pipe):
+    # TODO refactor with name
+    def generate_request(self, env, pipe):
         while True:
             yield env.timeout(random.expovariate(self.request_freq))
             msg = Message(self, personal_request)
@@ -157,6 +164,8 @@ class Node:
         Finds the transmission time to send a message from Node "self" to Node "receiver" 
         using the node independent transmission speed. 
     '''
-    def tranmission_time(self, receiver):
+    def transmission_time(self, receiver):
+        dist = numpy.linalg.norm(self.position - receiver.position)
+        return dist / self.transmission_speed
 
 
