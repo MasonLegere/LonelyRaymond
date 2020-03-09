@@ -1,19 +1,16 @@
-import MessageType
-from Message import Message
 from Node import Node
-from RequestMaker import *
 import numpy as np
 import simpy
 import random as rand
 import networkx as nx
 
-from MessageType import *
 
 
-class SimulationInstance():
-    # TODO see if frequency mean is valid
+class SimulationInstance:
 
     def __init__(self, transmission_speed, num_nodes, computation_mean=10, computation_stdev=5, frequency_mean=0.1):
+
+        self.G = nx.generators.trees.random_tree(num_nodes)
         self.transmission_speed = transmission_speed
         self.computation_mean = computation_mean
         self.computation_stdev = computation_stdev
@@ -26,64 +23,53 @@ class SimulationInstance():
         self.init_nodes()
 
     def init_nodes(self):
-        G = nx.generators.trees.random_tree(self.num_nodes)
-        print(G)
+
         x_pos = rand.randint(0, 1000)
         y_pos = rand.randint(0, 1000)
         position = np.array([x_pos, y_pos])
-        index = rand.randint(0, self.num_nodes)
+        index = rand.randint(0, self.num_nodes - 1)
 
-        newNode = []
-
-        initial_holder = Node(position, index, self.env, request_freq=frequency_mean, computation_mean=computation_mean,
-                              computation_stdev=computation_stdev)
-        listy = [n for n in G.neighbors(index)]
+        # Select a node at random to be the holder
+        initial_holder = Node(position, index, self, transmission_speed)
         initial_holder.setHolder(initial_holder)
-        self.assign_directions(initial_holder, index, G)
+        self.nodes.append(initial_holder)
+        print(initial_holder)
+        self.assign_directions(initial_holder, index, self.G)
 
-
-    def assign_directions(self, parent, parent_index, G, prev_index=-1):
-        listy = [n for n in G[parent_index]]
-        temp_node = None
-        for node in [n for n in G.neighbors(parent_index)]:
+    '''
+        Assigns directions to the spanning tree associated with the spanning tree G. This is done 
+        by expanding about the node holding the token, then recursively expanding about is children. 
+        In each expansion we assign direction towards the original node.
+        
+    '''
+    def assign_directions(self, parent, parent_index, prev_index=-1):
+        print(parent_index)
+        nhbrs = self.G.neighbors(parent_index)
+        for node in nhbrs:
             if node != prev_index:
                 x_pos = rand.randint(0, 1000)
                 y_pos = rand.randint(0, 1000)
                 position = np.array([x_pos, y_pos])
-                temp_node = Node(position, node, self.env, holder=parent, request_freq=frequency_mean,
-                                 computation_mean=computation_mean,
-                                 computation_stdev=computation_stdev)
-                self.nodes.append(temp_node)
-                self.assign_directions(temp_node, node, parent_index)
+                new_node = Node(position, node, self, parent)
+                self.nodes.append(new_node)
+                self.assign_directions(new_node, node, parent_index)
 
+    def start_simulation(self, simulation_time):
+        pipe = simpy.FilterStore(self.env)
 
-# This code is currently being used for testing
-# TODO create functionality for the generation of arbitrary spanning trees
+        for node in self.nodes:
+            print(node)
+            self.env.process(node.receive_message(self.env, pipe))
+            self.env.process(node.generate_request(self.env, pipe))
+        self.env.run(until=simulation_time)
 
 
 num_nodes = 10
 computation_mean = 10
 computation_stdev = 10
-frequency_mean = 10
-transmission_speed = 2.0
+frequency_mean = 0.05
+transmission_speed = 1000
 
 instance = SimulationInstance(transmission_speed, num_nodes, computation_mean, computation_stdev, frequency_mean)
-env = simpy.Environment()
-time = 10
-nodes = []
-pipe = simpy.FilterStore(env, capacity=100)
-node1 = Node(np.asarray([0, 1]), 1, env)
-node1.setHolder(node1)
-nodes.append(node1)
-node2 = Node(np.asarray([0, 2]), 2, env, holder=node1)
-nodes.append(node2)
+instance.start_simulation(100)
 
-env.process(node1.receive_message(env, pipe))
-env.process(node1.generate_request(env, pipe))
-
-env.process(node2.receive_message(env, pipe))
-env.process(node2.generate_request(env, pipe))
-
-env.run(100)
-
-# env.process(np.asarray([0,1]))

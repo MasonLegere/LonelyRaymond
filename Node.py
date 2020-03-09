@@ -24,10 +24,9 @@ class Node:
         Used for calculating the transmission time between nodes.
     '''
 
-    transmission_speed = 1.0
 
     # Position is [x,y] vector
-    def __init__(self, position, number, env, holder=None, request_freq = 0.1, computation_mean = 10.0, computation_stdev = 2.0):
+    def __init__(self, position, number, instance, holder=None):
 
         '''
         holder := relative position of the token relative to the node
@@ -63,20 +62,24 @@ class Node:
 
         self.holder = holder
         self.position = position
-        self.env = env
         self.number = number
         self.queue = []
         self.asked = 0
         self.using = 0
         self.left = 0
 
-        # simulation parameters
-        self.request_freq = request_freq
-        self.computation_mean = computation_mean
-        self.computation_stdev = computation_stdev
+        # simulation parameters and environment
+        self.env = instance.env
+        self.request_freq = instance.frequency_mean
+        self.computation_mean = instance.computation_mean
+        self.computation_stdev = instance.computation_stdev
+        self.transmission_speed = instance.transmission_speed
 
         # debugging variable
         self.nhbrs = None
+
+    def __str__(self):
+        return " "+str(self.number) + " " + str(self.holder.number) + " " + str(self.position)
 
     def set_nhbrs(self, nhbrs):
         self.nhbrs = nhbrs
@@ -134,16 +137,15 @@ class Node:
                     # than one outstanding node on the queue.
                     if self.holder != self and len(self.queue) != 0 and self.asked == 0:
                         yield env.timeout(self.transmission_time(self.holder))
-                        print('Sending message x')
                         pipe.put(Message(self.holder, resource_request, self))
                         self.asked = 1
 
                 else:
-                    print('Sending message xx')
+                    print('Sending message from' + str(self.number)+ ' ' + str(self.holder.number) )
                     yield env.timeout(self.transmission_time(self.holder))
                     pipe.put(Message(self.holder, pass_key, self))
-            # make request
 
+            # make request
             if self.holder != self and len(self.queue) != 0 and self.asked == 0:
                 yield env.timeout(self.transmission_time(self.holder))
                 pipe.put(Message(self.holder, resource_request, self))
@@ -151,6 +153,7 @@ class Node:
 
     # TODO refactor with name
     def generate_request(self, env, pipe):
+
         while True:
             yield env.timeout(random.expovariate(self.request_freq))
             msg = Message(self, personal_request)
@@ -166,6 +169,6 @@ class Node:
     '''
     def transmission_time(self, receiver):
         dist = numpy.linalg.norm(self.position - receiver.position)
-        return dist / self.transmission_speed
+        return dist / self.transmission_speed + 1.0
 
 
