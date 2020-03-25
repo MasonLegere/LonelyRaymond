@@ -5,7 +5,6 @@ import random as rand
 import networkx as nx
 
 
-
 class SimulationInstance:
 
     def __init__(self, transmission_speed, num_nodes, computation_mean=10, computation_stdev=5, frequency_mean=0.1):

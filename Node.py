@@ -130,7 +130,6 @@ class Node:
                     if self.holder == self and len(self.queue) != 0:
                         self.holder = self.queue.pop(0)
                         self.asked = 0
-                        print('I got here!')
                         pipe.put(Message(self.holder, pass_key, self))
 
                     # Send request to the new holder in the case where there is more
