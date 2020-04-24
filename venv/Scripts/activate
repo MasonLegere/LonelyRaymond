@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Mason\Documents\UNBC\Courses\W20\CPSC\CPSC441\raymondAlgorithm\venv"
+VIRTUAL_ENV="C:\Users\Mason Legere\Documents\workspace\UNBC\CPSC\CPSC441\raymondMutEx\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

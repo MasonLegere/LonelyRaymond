@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Mason\Documents\UNBC\Courses\W20\CPSC\CPSC441\raymondAlgorithm\venv
+set VIRTUAL_ENV=C:\Users\Mason Legere\Documents\workspace\UNBC\CPSC\CPSC441\raymondMutEx\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
