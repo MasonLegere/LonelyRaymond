@@ -2,7 +2,7 @@ import sys
 import matplotlib
 
 # Make sure that we are using QT5
-from lib.Message import MessageType
+from src.models.message import MessageType
 
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtCore, QtWidgets

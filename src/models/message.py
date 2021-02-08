@@ -9,6 +9,7 @@ class MessageType:
     Represents the datatype that is sent between messages. Used for animation as well as Raymond Algorithm Logic. 
 '''
 
+
 class Message:
 
     def __init__(self, receiver, message_type, time_sent, sender=None):
@@ -29,5 +30,3 @@ class Message:
     def transmission_time(sender, receiver):
         dist = np.linalg.norm(sender.position - receiver.position)
         return dist / sender.transmission_speed
-
-

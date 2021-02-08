@@ -1,9 +1,7 @@
 import math
-
 import random
-from lib.Message import *
 
-import numpy as np
+from src.models.message import *
 
 '''
  This acts as a complete implementation of Raymond's algorithm for distributed mutual 
@@ -18,13 +16,12 @@ import numpy as np
          "holder" field has be initialized correctly. 
 '''
 
-class Node:
 
+class Node:
     '''
         The transmission speed for sending messages between different Nodes.
         Used for calculating the transmission time between nodes.
     '''
-
 
     # Position is [x,y] vector
     def __init__(self, position, number, instance, holder=None):
@@ -81,7 +78,7 @@ class Node:
         self.nhbrs = None
 
     def __str__(self):
-        return " "+str(self.number) + " " + str(self.holder.number) + " " + str(self.position)
+        return " " + str(self.number) + " " + str(self.holder.number) + " " + str(self.position)
 
     def set_nhbrs(self, nhbrs):
         self.nhbrs = nhbrs
@@ -112,7 +109,6 @@ class Node:
                 self.holder = self.queue.pop(0)
                 self.asked = 0
 
-
                 if self.holder == self:
 
                     self.using = 1
@@ -138,7 +134,6 @@ class Node:
                         yield env.timeout(msg.trans_time)
                         pipe.put(msg)
 
-
                     # Send request to the new holder in the case where there is more
                     # than one outstanding node on the queue.
                     if self.holder != self and len(self.queue) != 0 and self.asked == 0:
@@ -156,7 +151,6 @@ class Node:
                     yield env.timeout(msg.trans_time)
                     pipe.put(msg)
 
-
             # make request
             if self.holder != self and len(self.queue) != 0 and self.asked == 0:
                 msg = Message(self.holder, MessageType.resource_request, env.now, self)
@@ -165,7 +159,6 @@ class Node:
                 pipe.put(msg)
 
                 self.asked = 1
-
 
     def generate_request(self, env, pipe, pipe_log):
 
@@ -182,8 +175,7 @@ class Node:
     '''
         Changes direction in direct graph from one -> two to: two -> one
     '''
+
     def switch_direction(self, one, two):
         self.G.add_edge(two.number, one.number)
         self.G.remove_edge(one.number, two.number)
-
-

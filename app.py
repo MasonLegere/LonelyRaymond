@@ -1,17 +1,19 @@
-
-from PyQt5.QtGui import QColor
-from NetworkDisplay import *
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QColor
 
-from SimulationInstance import SimulationInstance
+from src.network_display import *
+from src.simulation import SimulationInstance
+
 
 # Defines exception hook for better error messages
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 
+
 '''
     Creates the user interface for the application. 
 '''
+
 
 class Ui_RaymondsAlgorithm(object):
 
@@ -26,7 +28,7 @@ class Ui_RaymondsAlgorithm(object):
         RaymondsAlgorithm.setWindowIcon(QtGui.QIcon("Images/executableIcon.png"))
         RaymondsAlgorithm.setObjectName("RaymondsAlgorithm")
         RaymondsAlgorithm.resize(680, 800)
-        RaymondsAlgorithm.setStyleSheet("background-color: rgb(197, 197, 197);")
+        RaymondsAlgorithm.setStyleSheet("background-color: rgb(92, 70, 70);")
         RaymondsAlgorithm.setUnifiedTitleAndToolBarOnMac(False)
         self.centralwidget = QtWidgets.QWidget(RaymondsAlgorithm)
         self.centralwidget.setObjectName("centralwidget")
@@ -219,6 +221,7 @@ class Ui_RaymondsAlgorithm(object):
     '''
         Modifies and updates objects created by the designer. Assigns default and domain values. 
     '''
+
     def customizationsActions(self):
 
         self.progressBar.setValue(0)
@@ -283,7 +286,6 @@ class Ui_RaymondsAlgorithm(object):
         self.reqFreqVal.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.transSpeedVal.setFrameShape(QtWidgets.QFrame.StyledPanel)
 
-
         width = self.animationDisplay.frameGeometry().width()
         height = self.animationDisplay.frameGeometry().height()
         self.networkAnimation = MyDynamicMplCanvas(self, parent=self.animationDisplay, width=width,
@@ -298,6 +300,7 @@ class Ui_RaymondsAlgorithm(object):
     '''
         Provide lables to the objects created by the designer 
     '''
+
     def retranslateUi(self, RaymondsAlgorithm):
         _translate = QtCore.QCoreApplication.translate
         RaymondsAlgorithm.setWindowTitle(_translate("RaymondsAlgorithm", "Raymonds Algorithm Simulator"))
@@ -320,6 +323,7 @@ class Ui_RaymondsAlgorithm(object):
         Affects of changing the instance are only seen after the simulation 
         has been restarted. 
     '''
+
     def instanceChange(self):
 
         self.computationMeanVal.setText(str(self.compMeanSlider.value()))
@@ -344,6 +348,7 @@ class Ui_RaymondsAlgorithm(object):
         of storage would be needed. 
         of storage would be needed. 
     '''
+
     def startSimulation(self):
         # Making sure the most recent values are being used:
         if self.instance.num_nodes - 1 < self.instance.initialHolderNum:

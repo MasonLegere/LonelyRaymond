@@ -1,4 +1,4 @@
-from lib.Message import MessageType
+from src.models.message import MessageType
 
 '''
     Responsible for periodically checking what messages have been sent in the past interval. 

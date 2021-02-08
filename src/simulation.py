@@ -1,5 +1,5 @@
-from AnimationLogger import AnimationLogger
-from lib.Node import *
+from src.animation_logger import AnimationLogger
+from src.models.node import *
 import numpy as np
 import simpy
 import random as rand
